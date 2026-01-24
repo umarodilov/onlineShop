@@ -30,7 +30,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use('/images', express.static(path.join(__dirname, 'public/images')));
 
 // Routes
-const authRoutes = require('./routes/auth');
+const authRoutes = require('./routes/authRoutes');
 const ordersRoutes = require('./routes/orders');
 const usersRoutes = require('./routes/users');
 const categoriesRoutes = require('./routes/categories');

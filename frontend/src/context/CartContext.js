@@ -39,7 +39,7 @@
 //
 //         try {
 //             // Санҷиши stock
-//             const response = await fetch('http://localhost:5000/api/cart/check-stock', {
+//             const response = await fetch(`${process.env.REACT_APP_API_URL}/api/cart/check-stock', {
 //                 method: 'POST',
 //                 headers: { 'Content-Type': 'application/json' },
 //                 body: JSON.stringify({
@@ -97,7 +97,7 @@
 //         setError('');
 //
 //         try {
-//             const response = await fetch('http://localhost:5000/api/cart/check-stock', {
+//             const response = await fetch(`${process.env.REACT_APP_API_URL}/api/cart/check-stock', {
 //                 method: 'POST',
 //                 headers: { 'Content-Type': 'application/json' },
 //                 body: JSON.stringify({
@@ -197,7 +197,7 @@ export const CartProvider = ({ children }) => {
 
         try {
             // Санҷиши stock
-            const response = await fetch('http://localhost:5000/api/cart/check-stock', {
+            const response = await fetch(`${process.env.REACT_APP_API_URL}/api/cart/check-stock`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -255,7 +255,7 @@ export const CartProvider = ({ children }) => {
         setError('');
 
         try {
-            const response = await fetch('http://localhost:5000/api/cart/check-stock', {
+            const response = await fetch(`${process.env.REACT_APP_API_URL}/api/cart/check-stock`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({

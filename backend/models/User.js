@@ -20,7 +20,9 @@ const userSchema = new mongoose.Schema({
     password: {
         type: String,
         required: [true, 'Рамз зарур аст'],
-        minlength: [6, 'Рамз бояд камаш аз 6 аломат бошад']
+        minlength: [6, 'Рамз бояд камаш аз 6 аломат бошад'],
+        select: false
+
     },
     phone: {
         type: String,
@@ -65,21 +67,30 @@ const userSchema = new mongoose.Schema({
 });
 
 // МУҲИМ: Middleware барои hash кардани рамз
-userSchema.pre('save', async function(next) {
-    // Агар рамз иваз нашудааст, давом диҳед
-    if (!this.isModified('password')) {
-        return next();
-    }
+// userSchema.pre('save', async function(next) {
+//     // Агар рамз иваз нашудааст, давом диҳед
+//     if (!this.isModified('password')) {
+//         return next();
+//     }
+//
+//     try {
+//         // Hash кардани рамз
+//         const salt = await bcrypt.genSalt(12);
+//         this.password = await bcrypt.hash(this.password, salt);
+//         next();
+//     } catch (error) {
+//         next(error);
+//     }
+// });
+// МУҲИМ: Middleware барои hash кардани рамз
+userSchema.pre('save', async function () {
+    // Агар рамз иваз нашудааст, ҳеҷ кор накун
+    if (!this.isModified('password')) return;
 
-    try {
-        // Hash кардани рамз
-        const salt = await bcrypt.genSalt(12);
-        this.password = await bcrypt.hash(this.password, salt);
-        next();
-    } catch (error) {
-        next(error);
-    }
+    const salt = await bcrypt.genSalt(12);
+    this.password = await bcrypt.hash(this.password, salt);
 });
+
 
 // Муқоисаи рамз
 userSchema.methods.comparePassword = async function(candidatePassword) {

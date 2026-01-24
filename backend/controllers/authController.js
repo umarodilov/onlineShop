@@ -1,5 +1,4 @@
 const User = require('../models/User');
-const bcrypt = require('bcryptjs');
 const generateToken = require('../utils/generateToken');
 
 // ================= REGISTER =================
@@ -7,42 +6,44 @@ const register = async (req, res) => {
     try {
         const { name, email, password } = req.body;
 
-        // Тафтиши майдонҳои ҳатмӣ
         if (!name || !email || !password) {
-            return res.status(400).json({ success: false, message: 'Лутфан ҳама майдонҳоро пур кунед' });
+            return res.status(400).json({
+                success: false,
+                message: 'Лутфан ҳама майдонҳоро пур кунед'
+            });
         }
 
-        // Тафтиши вуҷуд доштани корбар
         const userExists = await User.findOne({ email });
         if (userExists) {
-            return res.status(400).json({ success: false, message: 'Email аллакай вуҷуд дорад' });
+            return res.status(400).json({
+                success: false,
+                message: 'Email аллакай вуҷуд дорад'
+            });
         }
 
-        // Хеш кардани password
-        const hashedPassword = await bcrypt.hash(password, 12);
-
-        // Эҷоди корбар
+        // password plain → User model hash мекунад
         const user = await User.create({
             name,
             email,
-            password: hashedPassword
+            password
         });
 
-        // Ҷавоб бо токен
-        res.status(201).json({
+        return res.status(201).json({
             success: true,
             token: generateToken(user._id),
             user: {
                 id: user._id,
                 name: user.name,
                 email: user.email,
-                role: user.role || 'user'
+                role: user.role
             }
         });
-
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ success: false, message: error.message });
+        console.error('REGISTER ERROR:', error);
+        return res.status(500).json({
+            success: false,
+            message: 'Хатои сервер ҳангоми register'
+        });
     }
 };
 
@@ -52,131 +53,101 @@ const login = async (req, res) => {
         const { email, password } = req.body;
 
         if (!email || !password) {
-            return res.status(400).json({ success: false, message: 'Email ва password лозим аст' });
+            return res.status(400).json({
+                success: false,
+                message: 'Email ва password лозим аст'
+            });
         }
 
-        const user = await User.findOne({ email });
-
+        const user = await User.findOne({ email }).select('+password');
         if (!user) {
-            return res.status(401).json({ success: false, message: 'Email ё password нодуруст аст' });
+            return res.status(401).json({
+                success: false,
+                message: 'Email ё password нодуруст аст'
+            });
         }
 
-        const isMatch = await bcrypt.compare(password, user.password);
+        const isMatch = await user.comparePassword(password);
         if (!isMatch) {
-            return res.status(401).json({ success: false, message: 'Email ё password нодуруст аст' });
+            return res.status(401).json({
+                success: false,
+                message: 'Email ё password нодуруст аст'
+            });
         }
 
-        res.json({
+        return res.json({
             success: true,
             token: generateToken(user._id),
             user: {
                 id: user._id,
                 name: user.name,
                 email: user.email,
-                role: user.role || 'user'
+                role: user.role
             }
         });
-
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ success: false, message: error.message });
+        console.error('LOGIN ERROR:', error);
+        return res.status(500).json({
+            success: false,
+            message: 'Хатои сервер ҳангоми login'
+        });
     }
 };
 
-module.exports = { register, login };
+// ================= GET ME =================
+const getMe = async (req, res) => {
+    try {
+        const user = await User.findById(req.user._id);
+        return res.json({
+            success: true,
+            user
+        });
+    } catch (error) {
+        return res.status(500).json({
+            success: false,
+            message: 'Хатои сервер'
+        });
+    }
+};
 
+// ================= UPDATE PROFILE =================
+const updateProfile = async (req, res) => {
+    try {
+        const { name, phone, address, avatar } = req.body;
 
+        const user = await User.findById(req.user._id);
 
-// const User = require('../models/User');
-// const bcrypt = require('bcryptjs');
-// const generateToken = require('../utils/generateToken');
-//
-// const register = async (req, res) => {
-//     try {
-//         const { name, email, password } = req.body;
-//
-//         const userExists = await User.findOne({ email });
-//         if (userExists) {
-//             return res.status(400).json({
-//                 success: false,
-//                 message: 'User already exists'
-//             });
-//         }
-//
-//         const user = await User.create({
-//             name,
-//             email,
-//             password
-//         });
-//
-//         res.status(201).json({
-//             success: true,
-//             token: generateToken(user._id),
-//             user: {
-//                 id: user._id,
-//                 name: user.name,
-//                 email: user.email,
-//                 role: user.role
-//             }
-//         });
-//     } catch (error) {
-//         console.error(error);
-//         res.status(500).json({
-//             success: false,
-//             message: error.message
-//         });
-//     }
-// };
-//
-// module.exports = { register };
-//
-//
-// // // backend/controllers/authController.js
-// // const User = require('../models/User');
-// // const { generateToken } = require('../middleware/auth');
-// //
-// // // 📌 REGISTER
-// // exports.register = async (req, res) => {
-// //     try {
-// //         const { name, email, password } = req.body;
-// //
-// //         const userExists = await User.findOne({ email });
-// //         if (userExists) {
-// //             return res.status(400).json({ message: 'Email мавҷуд аст' });
-// //         }
-// //
-// //         const user = await User.create({
-// //             name,
-// //             email,
-// //             password
-// //         });
-// //
-// //         res.status(201).json({
-// //             _id: user._id,
-// //             name: user.name,
-// //             email: user.email,
-// //             token: generateToken(user._id)
-// //         });
-// //
-// //     } catch (err) {
-// //         res.status(500).json({ message: err.message });
-// //     }
-// // };
-// //
-// // // 📌 LOGIN
-// // exports.login = async (req, res) => {
-// //     const { email, password } = req.body;
-// //
-// //     const user = await User.findOne({ email });
-// //
-// //     if (user && await user.matchPassword(password)) {
-// //         res.json({
-// //             _id: user._id,
-// //             name: user.name,
-// //             email: user.email,
-// //             token: generateToken(user._id)
-// //         });
-// //     } else {
-// //         res.status(401).json({ message: 'Email ё пароль хато' });
-// //     }
-// // };
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: 'Корбар ёфт нашуд'
+            });
+        }
+
+        if (name) user.name = name;
+        if (phone) user.phone = phone;
+        if (address) user.address = address;
+        if (avatar) user.avatar = avatar;
+
+        const updatedUser = await user.save();
+
+        return res.json({
+            success: true,
+            message: 'Профил нав шуд',
+            user: updatedUser
+        });
+    } catch (error) {
+        console.error('UPDATE PROFILE ERROR:', error);
+        return res.status(500).json({
+            success: false,
+            message: 'Хатои сервер ҳангоми навсозии профил'
+        });
+    }
+};
+
+module.exports = {
+    register,
+    login,
+    getMe,
+    updateProfile
+};

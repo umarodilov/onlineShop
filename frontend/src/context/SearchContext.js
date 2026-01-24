@@ -29,7 +29,7 @@ export const SearchProvider = ({ children }) => {
         const timeoutId = setTimeout(async () => {
             try {
                 const response = await fetch(
-                    `http://localhost:5000/api/products/search?q=${encodeURIComponent(searchQuery)}`,
+                    `${process.env.REACT_APP_API_URL}/api/products/search?q=${encodeURIComponent(searchQuery)}`,
                     { signal: controller.signal }
                 );
 
