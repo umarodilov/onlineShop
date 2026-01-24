@@ -72,9 +72,20 @@ const Header = ({ setCurrentPage, setSelectedProduct }) => {
                                     </div>
                                 </div>
                             ) : (
-                                <button onClick={() => setCurrentPage('auth')} className="bg-purple-600 text-white px-6 py-2 rounded-lg hover:bg-purple-700">
-                                    Воридшавӣ
+                                <button
+                                    onClick={() => setCurrentPage("auth")}
+                                    className="bg-purple-600 text-white w-10 h-10 sm:w-auto sm:h-auto
+             sm:px-5 sm:py-2.5 rounded-full sm:rounded-xl
+             hover:bg-purple-700 active:scale-95 transition
+             flex items-center justify-center gap-2"
+                                    aria-label="Воридшавӣ"
+                                >
+                                    <User className="w-5 h-5" />
+                                    <span className="hidden sm:inline">Воридшавӣ</span>
                                 </button>
+                                // <button onClick={() => setCurrentPage('auth')} className="bg-purple-600 text-white px-6 py-2 rounded-lg hover:bg-purple-700">
+                                //     Воридшавӣ
+                                // </button>
                             )}
 
                             <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="md:hidden">
